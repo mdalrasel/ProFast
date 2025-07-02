@@ -13,7 +13,7 @@ app.use(express.json())
 
 
 
-const serviceAccount = require("./zap-shift-firebase-admin.json");
+const serviceAccount = require("./profast-1-firebase-admin.json");
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
