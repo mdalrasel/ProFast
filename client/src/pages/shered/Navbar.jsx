@@ -54,7 +54,7 @@ const Navbar = () => {
                 {user ? (
                     <div className="dropdown dropdown-end">
                         <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
-                            <div className="w-10 rounded-full">
+                            <div className="w-10 rounded-md">
                                 <img src={user.photoURL || "https://i.ibb.co/2kRZ3mZ/default-user.png"} alt="user" />
                             </div>
                         </div>
@@ -64,7 +64,7 @@ const Navbar = () => {
                         </ul>
                     </div>
                 ) : (
-                    <button onClick={() => navigate('/logIn')} className="btn btn-neutral">Sign In</button>
+                    <button onClick={() => navigate('/logIn')} className="px-6 py-2 border border-[#D8F046]  font-semibold rounded-md hover:bg-[#D8F046] hover:text-black transition">Sign In</button>
                 )}
             </div>
         </div>

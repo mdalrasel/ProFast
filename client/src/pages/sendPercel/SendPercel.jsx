@@ -239,7 +239,7 @@ const SendParcel = () => {
 
                 {/* Submit Button */}
                 <div className="text-center">
-                    <button className="btn btn-primary text-black">Submit</button>
+                    <button className="px-6 py-2 border border-[#D8F046] font-semibold rounded-md hover:bg-[#D8F046]  mt-5 transition w-full">Submit</button>
                 </div>
             </form>
         </div>

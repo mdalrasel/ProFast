@@ -151,7 +151,7 @@ const Register = () => {
                 />
                 {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>}
 
-                <button type="submit" className="btn btn-primary w-full mt-6">Register</button>
+                <button type="submit" className="px-6 py-2 border border-[#D8F046] font-semibold rounded-md hover:bg-[#D8F046]  mt-5 transition w-full">Register</button>
                 <p>Already have an Account? <Link to='/logIn' className="text-blue-400">Login</Link></p>
 
             </form>

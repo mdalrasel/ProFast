@@ -29,10 +29,10 @@ const SatisfactionBanner = () => {
           every corner of Bangladesh right on time.
         </p>
         <div className="flex flex-wrap gap-4">
-          <button className="px-6 py-2 border border-[#D8F046] text-[#D8F046] font-semibold rounded-full hover:bg-[#D8F046] hover:text-black transition">
+          <button className="px-6 py-2 border border-[#D8F046] text-[#D8F046] font-semibold rounded-md hover:bg-[#D8F046] hover:text-black transition">
             Become a Merchant
           </button>
-          <button className="px-6 py-2 border border-[#D8F046] text-[#D8F046] font-semibold rounded-full hover:bg-[#D8F046] hover:text-black transition">
+          <button className="px-6 py-2 border border-[#D8F046] text-[#D8F046] font-semibold rounded-md hover:bg-[#D8F046] hover:text-black transition">
             Earn with Profast Courier
           </button>
         </div>

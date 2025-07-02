@@ -243,7 +243,7 @@ const onSubmit = async (data) => {
         </p>
         <button
           type="submit"
-          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded shadow"
+         className="px-6 py-2 border-2 border-[#D8F046] font-semibold rounded-md hover:bg-[#D8F046]  mt-5 transition "
         >
           Send Parcel
         </button>

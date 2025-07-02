@@ -62,10 +62,10 @@ const Faq = () => {
             </div>
 
             <div class="flex justify-center mt-10">
-                <button class="btn bg-lime-400 hover:bg-lime-500 text-gray-800 font-semibold py-3 px-6 rounded-full shadow-lg flex items-center mr-4">
+                <button class="btn bg-lime-400 hover:bg-lime-500 text-gray-800 font-semibold py-3 px-6 rounded-md shadow-lg flex items-center mr-4">
                     See More FAQ's
                 </button>
-                <button class="btn bg-gray-800 hover:bg-gray-700 text-white font-semibold py-3 px-6 rounded-full shadow-lg flex items-center">
+                <button class="btn bg-gray-800 hover:bg-gray-700 text-white font-semibold py-3 px-6 rounded-md shadow-lg flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                     </svg>
