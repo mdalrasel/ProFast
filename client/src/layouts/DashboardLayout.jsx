@@ -1,7 +1,17 @@
 import { NavLink, Outlet } from 'react-router';
 import ProFastLogo from '../pages/shered/ProFastLogo';
+import useAdmin from '../hooks/useAdmin';
 
 const DashboardLayout = () => {
+     const [isAdmin, isAdminLoading] = useAdmin();
+
+      if (isAdminLoading) {
+        return (
+            <div className="h-screen flex items-center justify-center">
+                <span className="loading loading-spinner text-primary"></span>
+            </div>
+        );
+    }
     return (
         <div className="drawer lg:drawer-open w-11/12 mx-auto mt-5">
             <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
@@ -27,7 +37,7 @@ const DashboardLayout = () => {
                         </label>
                     </div>
                     <div className="mx-2 flex-1 px-2 lg:hidden">Dashboard</div>
-                    
+
                 </div>
                 {/* Page content here */}
                 <Outlet></Outlet>
@@ -36,17 +46,23 @@ const DashboardLayout = () => {
             </div>
             <div className="drawer-side">
                 <label htmlFor="my-drawer-2" aria-label="close sidebar" className="drawer-overlay"></label>
-                <ul className="menu bg-base-200 text-base-content min-h-full w-80 p-4"> 
+                <ul className="menu bg-base-200 text-base-content min-h-full w-80 p-4">
                     {/* Sidebar content here */}
                     <ProFastLogo></ProFastLogo>
                     <li><a>Home</a></li>
                     <li><NavLink to="/dashboard/myParcels">My Parcels</NavLink></li>
-                    <li><NavLink to="/dashboard/users">All Users</NavLink></li>
-                    <li><NavLink to="/dashboard/riders/pending">Pending Riders </NavLink></li>
-                    <li><NavLink to="/dashboard/riders/approved">Approved Riders</NavLink></li>
+                    {
+                        isAdmin && (
+                            <>
+                                <li><NavLink to="/dashboard/users">All Users</NavLink></li>
+                                <li><NavLink to="/dashboard/riders/pending">Pending Riders </NavLink></li>
+                                <li><NavLink to="/dashboard/riders/approved">Approved Riders</NavLink></li>
+                            </>
+                        )
+                    }
                 </ul>
             </div>
-            
+
         </div>
     );
 };

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
+import Swal from "sweetalert2";
 
 
 const PendingRiders = () => {
@@ -7,43 +8,89 @@ const PendingRiders = () => {
   const axiosSecure = useAxiosSecure();
   // const navigate = useNavigate();
 
-  const fetchPending = () => {
+   const fetchPending = () => {
     axiosSecure.get("/riders?status=pending").then((res) => {
       setPendingRiders(res.data);
+    }).catch(err => {
+        console.error("Failed to fetch pending riders", err);
+        if (err.response && err.response.status === 403) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Access Denied',
+                text: 'You do not have permission to view pending riders.',
+            });
+        }
     });
   };
 
-  useEffect(() => {
+    useEffect(() => {
     fetchPending();
-  },);
+  }, [axiosSecure]);
 
-  const handleApprove = async (id) => {
+   const handleApprove = async (id) => {
     try {
       const res = await axiosSecure.patch(`/riders/status/${id}`, {
         status: "approved",
       });
 
       if (res.data.modifiedCount > 0) {
-        fetchPending(); // Refetch list
+        Swal.fire('সফল!', 'রাইডার অনুমোদিত হয়েছে।', 'success');
+        fetchPending(); 
+      } else {
+          Swal.fire('ব্যর্থ!', 'রাইডার অনুমোদন করা যায়নি।', 'error');
       }
     } catch (err) {
-      console.error("Approve failed:", err);
+      console.error("অনুমোদন ব্যর্থ:", err);
+      if (err.response && err.response.status === 403) {
+          Swal.fire({
+              icon: 'error',
+              title: 'Access Denied',
+              text: 'You do not have permission to approve riders.',
+          });
+      } else {
+          Swal.fire('ত্রুটি!', 'রাইডার অনুমোদন করতে ব্যর্থ।', 'error');
+      }
     }
   };
 
-  const handleReject = async (id) => {
-    try {
-      const res = await axiosSecure.patch(`/riders/status/${id}`, {
-        status: "rejected",
-      });
-
-      if (res.data.modifiedCount > 0) {
-        fetchPending(); // Refetch
-      }
-    } catch (err) {
-      console.error("Reject failed:", err);
-    }
-  };
+ const handleReject = (riderId) => {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You want to reject and remove this rider?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, reject and remove!'
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            try {
+                const res = await axiosSecure.patch(`/riders/status/${riderId}`, { status: 'rejected' });
+                
+                if (res.data.deleted) { 
+                    Swal.fire(
+                        'Rejected!',
+                        'The rider has been rejected and removed.',
+                        'success'
+                    );
+                } else {
+                     Swal.fire(
+                        'Failed!',
+                        'Could not reject and remove the rider.',
+                        'error'
+                    );
+                }
+            } catch (error) {
+                console.error("Error rejecting rider:", error);
+                Swal.fire(
+                    'Error!',
+                    'There was an error rejecting the rider.',
+                    'error'
+                );
+            }
+        }
+    });
+};
 
   // const handleView = (id) => {
   //   navigate(`/dashboard/riders/${id}`);

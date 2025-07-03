@@ -1,13 +1,23 @@
 import { useEffect, useState } from "react";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
+import Swal from "sweetalert2";
 
 const ApprovedRiders = () => {
   const [approvedRiders, setApprovedRiders] = useState([]);
   const axiosSecure = useAxiosSecure();
 
-  useEffect(() => {
+   useEffect(() => {
     axiosSecure.get("/riders?status=approved").then((res) => {
       setApprovedRiders(res.data);
+    }).catch(err => {
+        console.error("Failed to fetch approved riders", err);
+        if (err.response && err.response.status === 403) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Access Denied',
+                text: 'You do not have permission to view approved riders.',
+            });
+        }
     });
   }, [axiosSecure]);
 
