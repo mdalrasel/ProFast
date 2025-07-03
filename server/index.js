@@ -65,6 +65,15 @@ async function run() {
             next()
         }
 
+        const verifyAdmin = async (req, res, next) => {
+            const email = req.decoded.email;
+            const user = await usersCollection.findOne({ email });
+            if (user?.role !== 'admin') {
+                return res.status(403).send({ message: 'forbidden access' });
+            }
+            next();
+        };
+
         // GET /api/parcels?email=user@example.com
         app.get('/parcels', verifyFirebaseToken, async (req, res) => {
             const email = req.query.email;
@@ -137,7 +146,6 @@ async function run() {
             const payment = req.body;
             const result = await paymentsCollection.insertOne(payment);
 
-            // ✅ ২. parcels collection-এ ঐ parcel এর status update করো
             const updateResult = await parcelCollection.updateOne(
                 { _id: new ObjectId(payment.parcelId) },
                 {
@@ -163,16 +171,39 @@ async function run() {
                 return res.status(200).send({ message: 'User already exists', inserted: false });
             }
             const user = req.body;
-            const result = await usersCollection.insertOne(user);
+            const result = await usersCollection.insertOne({ ...user, role: 'user' });
             res.send(result);
         })
 
-        app.get('/users', verifyFirebaseToken, async (req, res) => {
+        app.get('/users', verifyFirebaseToken, verifyAdmin, async (req, res) => {
             const users = await db.collection('users')
                 .find()
                 .sort({ createdAt: -1 })
                 .toArray();
             res.send(users);
+        });
+
+        // PATCH /users/admin/:id:(only admin)
+        app.patch('/users/admin/:id', verifyFirebaseToken, verifyAdmin, async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) };
+            const updateDoc = {
+                $set: {
+                    role: 'admin'
+                }
+            };
+            const result = await usersCollection.updateOne(filter, updateDoc);
+            res.send(result);
+        });
+
+        // GET /users/admin/:email: 
+        app.get('/users/admin/:email', verifyFirebaseToken, async (req, res) => {
+            const email = req.params.email;
+            if (req.decoded.email !== email) {
+                return res.status(403).send({ message: 'forbidden access' });
+            }
+            const user = await usersCollection.findOne({ email });
+            res.send({ admin: user?.role === 'admin' });
         });
 
 
@@ -182,30 +213,49 @@ async function run() {
             res.send(result);
         });
 
-        app.get('/riders', verifyFirebaseToken, async (req, res) => {
+         app.get('/riders', verifyFirebaseToken, verifyAdmin, async (req, res) => {
             const status = req.query.status;
             const query = status ? { status } : {};
-            const riders = await db.collection("riders").find(query).toArray();
+            const riders = await ridersCollection.find(query).toArray();
             res.send(riders);
         });
 
-        app.patch('/riders/status/:id', async (req, res) => {
+        app.patch('/riders/status/:id', verifyFirebaseToken, verifyAdmin, async (req, res) => {
             const id = req.params.id;
             const { status } = req.body;
 
-            const result = await db.collection("riders").updateOne(
-                { _id: new ObjectId(id) },
-                { $set: { status } }
-            );
-
-            res.send(result);
+            try {
+                let result;
+                if (status === 'rejected') {
+                    result = await ridersCollection.deleteOne({ _id: new ObjectId(id) });
+                    if (result.deletedCount === 0) {
+                        return res.status(404).send({ message: 'Rider not found for deletion' });
+                    }
+                    res.send({ message: 'Rider rejected and removed successfully', deleted: true });
+                } else {
+                    result = await ridersCollection.updateOne(
+                        { _id: new ObjectId(id) },
+                        { $set: { status } }
+                    );
+                    if (result.modifiedCount === 0) {
+                        return res.status(404).send({ message: 'Rider not found or status already same' });
+                    }
+                    res.send({ message: 'Rider status updated successfully', updated: true });
+                }
+            } catch (error) {
+                console.error('Error updating/deleting rider status:', error);
+                res.status(500).send({ message: 'Failed to update/delete rider status', error: error.message });
+            }
         });
+
 
         app.get('/riders/status', async (req, res) => {
             const email = req.query.email;
             const rider = await db.collection("riders").findOne({ email });
             res.send({ status: rider?.status || "not_applied" });
         });
+
+
 
 
         await client.db("admin").command({ ping: 1 });
